@@ -1,0 +1,19 @@
+{
+  "Administrative": 2,
+  "Administrative_Duration": 45.5,
+  "Informational": 1,
+  "Informational_Duration": 30.0,
+  "ProductRelated": 35,
+  "ProductRelated_Duration": 1200.5,
+  "BounceRates": 0.02,
+  "ExitRates": 0.04,
+  "PageValues": 25.7,
+  "SpecialDay": 0.0,
+  "Month": "Nov",
+  "OperatingSystems": 2,
+  "Browser": 2,
+  "Region": 1,
+  "TrafficType": 2,
+  "VisitorType": "Returning_Visitor",
+  "Weekend": false
+}
