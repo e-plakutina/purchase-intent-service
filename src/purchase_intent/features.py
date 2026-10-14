@@ -6,7 +6,6 @@ COUNT_COLS = ["Administrative", "Informational", "ProductRelated"]
 FLAG_BASE = [
     "PageValues",
     "Informational",
-    "Administrative",
     "BounceRates",
     "SpecialDay",
 ]

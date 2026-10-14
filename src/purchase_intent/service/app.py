@@ -78,7 +78,6 @@ def predict(X: Features, bg: BackgroundTasks) -> Prediction:
     t0 = time.perf_counter()
     request_id = str(uuid.uuid4())
     payload = X.model_dump()
-    payload["Weekend"] = int(payload["Weekend"])
     frame = pd.DataFrame([payload]).reindex(columns=app.state.meta["features"])
 
     score = float(app.state.pipeline.predict_proba(frame)[0, 1])

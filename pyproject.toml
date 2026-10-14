@@ -12,16 +12,25 @@ dependencies = [
     "psycopg[binary]",
     "pandas",
     "scikit-learn",
-    "joblib"
+    "joblib",
+    "numpy"
 ]
 
 [dependency-groups]
+data = [
+    "kagglehub>=1.0.2",
+]
 dev = [
     "pytest",
     "httpx2",
     "locust",
     "ruff",
     "pre-commit"
+]
+notebooks = [
+    "matplotlib>=3.11.2",
+    "seaborn>=0.13.2",
+    "ipykernel",
 ]
 
 [build-system]
