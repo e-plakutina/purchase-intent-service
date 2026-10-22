@@ -5,7 +5,8 @@ from contextlib import asynccontextmanager
 
 import joblib
 import pandas as pd
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from pydantic import BaseModel, Field
 
@@ -41,8 +42,6 @@ class Prediction(BaseModel):
     purchase: bool
     model_version: str
     request_id: str
-    latency_ms: float
-    response_code: int
 
 
 @asynccontextmanager
@@ -73,27 +72,46 @@ def ready():
     return {"status": "ready"}
 
 
-@app.post("/v1/predict")
-def predict(X: Features, bg: BackgroundTasks) -> Prediction:
+@app.middleware("http")
+async def log_predictions(request: Request, call_next):
+    if request.url.path != "/v1/predict":
+        return await call_next(request)
+
+    request.state.request_id = str(uuid.uuid4())
     t0 = time.perf_counter()
-    request_id = str(uuid.uuid4())
+
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        response = JSONResponse({"detail": str(e)}, status_code=500)
+
+    latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+    response.headers["X-Request-Id"] = request.state.request_id
+
+    tasks = BackgroundTasks()
+    tasks.add_task(
+        db.save_prediction,
+        request.state.request_id,
+        getattr(request.state, "features", None),
+        getattr(request.state, "score", None),
+        app.state.version,
+        latency_ms,
+        response.status_code,
+    )
+    response.background = tasks
+
+    return response
+
+
+@app.post("/v1/predict")
+def predict(X: Features, request: Request) -> Prediction:
     payload = X.model_dump()
     frame = pd.DataFrame([payload]).reindex(columns=app.state.meta["features"])
 
     score = float(app.state.pipeline.predict_proba(frame)[0, 1])
 
-    latency_ms = round((time.perf_counter() - t0) * 1000, 2)
-
-    response_code = 200
-    bg.add_task(
-        db.save_prediction,
-        request_id,
-        payload,
-        score,
-        app.state.version,
-        latency_ms,
-        response_code,
-    )
+    request.state.features = payload
+    request.state.score = score
 
     purchase = score >= app.state.meta["threshold"]
 
@@ -101,7 +119,5 @@ def predict(X: Features, bg: BackgroundTasks) -> Prediction:
         score=score,
         purchase=purchase,
         model_version=app.state.version,
-        request_id=request_id,
-        latency_ms=latency_ms,
-        response_code=response_code,
+        request_id=request.state.request_id,
     )
