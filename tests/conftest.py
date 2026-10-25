@@ -1,3 +1,7 @@
+"""
+Общие фикстуры для тестов: client - тестовый клиент с загруженной моделью, good_row - эталонный корректный запрос.
+"""
+
 import pytest
 from fastapi.testclient import TestClient
 

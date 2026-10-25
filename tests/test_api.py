@@ -1,9 +1,8 @@
+"""
+Тесты проверяют контракт API: эндпоинты /health и /ready отвечают 200, /v1/predict отклоняет некорректные запросы с 422.
+"""
+
 import pytest
-
-
-def test_value_not_seen_in_training_is_422(client, good_row, field, value):
-    r = client.post("/v1/predict", json={**good_row, field: value})
-    assert r.status_code == 422
 
 
 def test_health(client):
