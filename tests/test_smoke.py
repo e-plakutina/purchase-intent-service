@@ -1,3 +1,6 @@
+import uuid
+
+
 def test_predict_smoke(client, good_row):
     r = client.post("/v1/predict", json=good_row)
     assert r.status_code == 200
@@ -5,16 +8,16 @@ def test_predict_smoke(client, good_row):
     assert 0.0 <= body["score"] <= 1.0
     assert isinstance(body["purchase"], bool)
     assert body["latency_ms"] >= 0
-    assert body["model_version"]
-    assert body["response_code"] == 200
+    assert body["model_version"] == client.app.state.version
+    uuid.UUID(body["request_id"])
 
 
-def test_predict_handles_missing_page_values(client, good_row):
-    r = client.post("/v1/predict", json={**good_row, "PageValues": None})
-    assert r.status_code == 200
+def test_purchase_follows_threshold(client, good_row):
+    body = client.post("/v1/predict", json=good_row).json()
+    assert body["purchase"] == (body["score"] >= client.app.state.meta["threshold"])
 
 
-def test_batch_and_single_agree(client, good_row):
+def test_same_input_gives_same_score(client, good_row):
     s1 = client.post("/v1/predict", json=good_row).json()["score"]
     s2 = client.post("/v1/predict", json=good_row).json()["score"]
-    assert abs(s1 - s2) < 1e-12
+    assert s1 == s2

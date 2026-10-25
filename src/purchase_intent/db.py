@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS predictions(
     request_id          uuid PRIMARY KEY,
     ts                  timestamptz NOT NULL DEFAULT now(),
     model_version       text NOT NULL,
-    features            jsonb,
+    features            jsonb NOT NULL,
     score               double precision,
     latency_ms          real NOT NULL,
     response_code       int NOT NULL
@@ -40,7 +40,7 @@ def save_prediction(
             (
                 request_id,
                 model_version,
-                Json(features) if features is not None else None,
+                Json(features),
                 score,
                 latency_ms,
                 response_code,

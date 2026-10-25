@@ -1,10 +1,20 @@
 import time
 import uuid
+import json
 
 from fastapi import BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 
 from purchase_intent import db
+
+
+def read_features(body: bytes) -> dict:
+    text = body.decode("utf-8", errors="replace")
+    try:
+        features = json.loads(text)
+    except ValueError:
+        return {"raw": text}
+    return features if isinstance(features, dict) else {"raw": text}
 
 
 async def log_predictions(request: Request, call_next):
@@ -13,6 +23,8 @@ async def log_predictions(request: Request, call_next):
 
     request.state.request_id = str(uuid.uuid4())
     t0 = time.perf_counter()
+    request.state.t0 = t0
+    features = read_features(await request.body())
 
     try:
         response = await call_next(request)
@@ -26,7 +38,7 @@ async def log_predictions(request: Request, call_next):
     tasks.add_task(
         db.save_prediction,
         request.state.request_id,
-        getattr(request.state, "features", None),
+        features,
         getattr(request.state, "score", None),
         request.app.state.version,
         latency_ms,

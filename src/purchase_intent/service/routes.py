@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Request
 
@@ -28,14 +29,16 @@ def predict(X: Features, request: Request) -> Prediction:
 
     score = float(request.app.state.pipeline.predict_proba(frame)[0, 1])
 
-    request.state.features = payload
     request.state.score = score
 
     purchase = score >= request.app.state.meta["threshold"]
+
+    latency_ms = round((time.perf_counter() - request.state.t0) * 1000, 2)
 
     return Prediction(
         score=score,
         purchase=purchase,
         model_version=request.app.state.version,
         request_id=request.state.request_id,
+        latency_ms=latency_ms,
     )

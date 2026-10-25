@@ -16,11 +16,6 @@ def test_flags(good_row):
     assert output.loc[0, "has_SpecialDay"] == 0
 
 
-def test_missing_page_values_gives_zero_flag(good_row):
-    output = add_features(pd.DataFrame([{**good_row, "PageValues": None}]))
-    assert output.loc[0, "has_PageValues"] == 0
-
-
 def test_avg_time(good_row):
     output = add_features(pd.DataFrame([good_row]))
     assert output.loc[0, "ProductRelated_avg_time"] == pytest.approx(1200.5 / 35)

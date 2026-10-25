@@ -1,3 +1,11 @@
+import pytest
+
+
+def test_value_not_seen_in_training_is_422(client, good_row, field, value):
+    r = client.post("/v1/predict", json={**good_row, field: value})
+    assert r.status_code == 422
+
+
 def test_health(client):
     r = client.get("/health")
     assert r.status_code == 200
@@ -8,8 +16,25 @@ def test_ready(client):
     assert client.get("/ready").status_code == 200
 
 
-def test_bad_tenure_is_422(client, good_row):
-    r = client.post("/v1/predict", json={**good_row, "Informational": -1})
+@pytest.mark.parametrize(
+    "field, value",
+    [
+        ("Month", "Jan"),
+        ("Month", "Jun"),
+        ("VisitorType", "abc"),
+        ("PageValues", None),
+        ("Informational", -1),
+        ("ProductRelated_Duration", 70000),
+        ("BounceRates", 1.5),
+        ("ExitRates", -0.1),
+        ("OperatingSystems", 0),
+        ("TrafficType", 21),
+        ("Administrative", "abc"),
+        ("Weekend", "maybe"),
+    ],
+)
+def test_invalid_value_is_422(client, good_row, field, value):
+    r = client.post("/v1/predict", json={**good_row, field: value})
     assert r.status_code == 422
 
 
@@ -21,4 +46,16 @@ def test_missing_field_is_422(client, good_row):
 
 def test_extra_field_is_422(client, good_row):
     r = client.post("/v1/predict", json={**good_row, "hacker_field": 1})
+    assert r.status_code == 422
+
+
+def test_target_in_request_is_422(client, good_row):
+    r = client.post("/v1/predict", json={**good_row, "Revenue": True})
+    assert r.status_code == 422
+
+
+def test_garbage_body_is_422(client):
+    r = client.post(
+        "/v1/predict", content=b"not json", headers={"Content-Type": "application/json"}
+    )
     assert r.status_code == 422
