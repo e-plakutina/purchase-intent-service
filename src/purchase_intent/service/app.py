@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 
 import joblib
-
 from fastapi import FastAPI
 
 from purchase_intent import db
