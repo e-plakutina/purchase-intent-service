@@ -43,3 +43,7 @@ module-name = "purchase_intent"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
