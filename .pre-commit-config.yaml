@@ -18,3 +18,4 @@ repos:
     rev: 0.7.1
     hooks:
       - id: nbstripout
+        args: [--keep-output, --keep-count]
