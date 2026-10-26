@@ -1,0 +1,13 @@
+.git
+.venv
+.idea
+.pytest_cache
+.ruff_cache
+**/__pycache__
+.env
+data
+notebooks
+tests
+examples
+scripts
+k8s
