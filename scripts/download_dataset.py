@@ -1,6 +1,6 @@
 """Получение датасета Online Shoppers Purchasing Intention Dataset.
 
-Запуск: python download_dataset.py
+Запуск: make data (или uv run --group data python scripts/download_dataset.py)
 
 Скрипт пробует скачать датасет с Kaggle через kagglehub.
 Если скачать не получилось (нет сети или авторизации Kaggle), печатает инструкцию для скачивания вручную.
