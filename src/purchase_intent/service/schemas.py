@@ -30,9 +30,26 @@ class Features(BaseModel):
     Weekend: bool
 
 
+class BatchFeatures(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    rows: list[Features] = Field(min_length=1, max_length=1000)
+
+
 class Prediction(BaseModel):
     score: float
     purchase: bool
     model_version: str
     request_id: str
+    latency_ms: float
+
+
+class BatchItem(BaseModel):
+    score: float
+    purchase: bool
+
+
+class BatchPrediction(BaseModel):
+    predictions: list[BatchItem]
+    model_version: str
     latency_ms: float
