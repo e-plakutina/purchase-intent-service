@@ -10,7 +10,7 @@ SQL     := SELECT request_id, ts, model_version, score, latency_ms, response_cod
 LOAD_HOST ?= http://127.0.0.1:8000
 LOCUST    := uv run locust -f loadtest/locustfile.py --headless --only-summary -t 60s -H $(LOAD_HOST)
 
-.PHONY: help install data lint format test serve up down logs compose kind-up kind-deploy kind kind-down load
+.PHONY: help install data lint format test serve up down logs compose kind-up kind-deploy kind kind-down load bench
 
 help: ## Список команд
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -81,3 +81,6 @@ load: up ## Нагрузочный тест: три прогона по 60 се�
 	$(LOCUST) -u 10 -r 5 --csv loadtest/results/run10
 	$(LOCUST) -u 50 -r 10 --csv loadtest/results/run50
 	$(LOCUST) -u 100 -r 20 --csv loadtest/results/run100
+
+bench: up ## Замер батч-эндпоинта: 1 строка против 500, медиана из 10 повторов
+	uv run python loadtest/batch_latency.py
