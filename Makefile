@@ -7,7 +7,10 @@ PORT    ?= 8080
 REQUEST := examples/request.json
 SQL     := SELECT request_id, ts, model_version, score, latency_ms, response_code FROM predictions ORDER BY ts DESC LIMIT 5
 
-.PHONY: help install data lint format test serve up down logs compose kind-up kind-deploy kind kind-down
+LOAD_HOST ?= http://127.0.0.1:8000
+LOCUST    := uv run locust -f loadtest/locustfile.py --headless --only-summary -t 60s -H $(LOAD_HOST)
+
+.PHONY: help install data lint format test serve up down logs compose kind-up kind-deploy kind kind-down load
 
 help: ## Список команд
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -72,3 +75,9 @@ kind: kind-deploy ## Kubernetes: деплой в kind и запрос к мод�
 
 kind-down: ## Удалить кластер kind
 	kind delete cluster --name $(CLUSTER)
+
+load: up ## Нагрузочный тест: три прогона по 60 секунд на 10, 50 и 100 пользователей
+	mkdir -p loadtest/results
+	$(LOCUST) -u 10 -r 5 --csv loadtest/results/run10
+	$(LOCUST) -u 50 -r 10 --csv loadtest/results/run50
+	$(LOCUST) -u 100 -r 20 --csv loadtest/results/run100
