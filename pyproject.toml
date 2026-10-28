@@ -45,5 +45,8 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
+
+[tool.roof]
+line-length = 150
