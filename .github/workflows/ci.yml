@@ -10,7 +10,7 @@ jobs:
     services:
       postgres:
         image: postgres:16
-        env: {POSTGRESS_PASSWORD: test, POSTGRES_DB: purchase_intent}
+        env: {POSTGRES_PASSWORD: test, POSTGRES_DB: purchase_intent}
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres"
@@ -26,3 +26,27 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run pytest
+
+  build:
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions: {contents: read, packages: write}
+
+    steps:
+      - uses: action/checkout@v7
+      - run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER}/purchase-intent-service/sha-${GITHUB_SHA}" >> $GITHUB_ENV
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
