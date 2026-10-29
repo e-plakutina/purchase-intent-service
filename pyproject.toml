@@ -1,6 +1,6 @@
 [project]
 name = "purchase-intent-service"
-version = "0.1.0"
+version = "0.2.0"
 description = "Service for predicting buyers intention"
 requires-python = ">=3.11,<3.13"
 
@@ -43,6 +43,7 @@ module-name = "purchase_intent"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["integration: нужна база данных - адрес в DATABASE_URL"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
