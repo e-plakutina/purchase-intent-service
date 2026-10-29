@@ -12,7 +12,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY src/ src/
 RUN uv sync --frozen --no-dev
 
-COPY artifact/ artifact/
+COPY artifacts/ artifacts/
 
 EXPOSE 8000
 CMD ["uv", "run", "--no-sync", "uvicorn", "purchase_intent.service.app:app", "--host", "0.0.0.0", "--port", "8000"]
