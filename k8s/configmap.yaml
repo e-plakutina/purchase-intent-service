@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: purchase-intent-config
+data:
+  LOG_LEVEL: "INFO"
+  MODEl_PATH: artifacts/model.joblib

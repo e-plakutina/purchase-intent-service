@@ -18,6 +18,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
+          envFrom:
+            - configMapRef: {name: purchase-intent-config}
+            - secretRef: {name: purchase-intent-service-service}
           startupProbe:
             httpGet: {path: /health, port: 8000}
             failureThreshold: 30

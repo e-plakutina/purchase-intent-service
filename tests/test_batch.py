@@ -12,7 +12,7 @@ def test_batch_matches_single(client, good_row):
     assert r.status_code == 200
     predictions = r.json()["predictions"]
     assert len(predictions) == len(rows)
-    for row, pred in zip(rows, predictions):
+    for row, pred in zip(rows, predictions, strict=True):
         single = client.post("/v1/predict", json=row).json()
         assert pred["score"] == pytest.approx(single["score"])
         assert pred["purchase"] == single["purchase"]

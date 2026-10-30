@@ -104,7 +104,7 @@ curl -X POST http://localhost:8000/v1/predict -H "Content-Type: application/json
 
 PR-AUC на вложенной кросс-валидации = 0.750 +- 0.018: оценка на тесте попадает в разброс по фолдам.
 
-Pipeline сохранен в `artifact/model.joblib` вместе с паспортом модели: версия, порядок входных полей и порог.
+Pipeline сохранен в `artifacts/model.joblib` вместе с паспортом модели: версия, порядок входных полей и порог.
 
 1. `add_features` (`src/purchase_intent/features.py`) - флаги ненулевых значений, среднее время на страницу, приведение типов.
 2. `ColumnTransformer` - log1p для счетчиков и длительностей, one-hot для категорий с объединением редких.
